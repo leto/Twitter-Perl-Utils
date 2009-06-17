@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Net::Twitter;
+use Twitter::TagGrep;
+my (@tags) = @ARGV;
+$|++;
+unless (@tags) {
+    print "Usage: tgrep some hash tags\n";
+    exit;
+}
+
+my $twit = Net::Twitter->new({
+                              username => $ENV{TWITTERUSER},
+                              password => $ENV{TWITTERPASS},
+                              traits => [qw/API::REST/],
+           });
+
+my $tg = Twitter::TagGrep->new( prefix => '#!',
+                                tags => [ @tags ] );
+
+my $timeline = $twit->friends_timeline({count=>200}); # max allowed
+my @matches  = $tg->grep_tags($timeline);
+
+for my $tweet (@matches) {
+    print join(', ', @{$tweet->{tags}}), ": ",$tweet->{text},"\n";
+}
+
