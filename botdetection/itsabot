@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+
+use strict;
+use WWW::ItsABot qw/is_a_bot/;
+$|++;
+
+my (@usernames) = @ARGV;
+
+unless (@usernames) {
+    print "Usage: itsabot some user names\n";
+    exit;
+}
+
+my $isabot;
+
+for my $user (@usernames) {
+    eval {
+        $isabot = is_a_bot($user);
+    };
+    if ($@) {
+        warn $@;
+        print "$user:0\n";
+    } elsif ( $isabot )  {
+        print "$user:1\n";
+    } else {
+        print "$user:0\n";
+    }
+    sleep 2 if (@usernames > 5); # be nice
+}
